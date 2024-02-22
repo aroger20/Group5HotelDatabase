@@ -51,7 +51,7 @@ public class Group5HotelDatabase {
      * @param conn SQL connection
      */
     public static void mainMenu(Scanner in, Connection conn) {
-        int input;
+        int input = 0;
         System.out.print("\n*********************************");
         System.out.print("\n* Group 5 Hotel Database System *");
         System.out.println("\n*********************************");
@@ -60,9 +60,15 @@ public class Group5HotelDatabase {
             while(true) {
                 System.out.println("\n1)Query\n2)Insert\n3)Update\n4)Delete\n5)Load Dummy Data\n6)Quit");
                 System.out.print("Please select a number: ");
-                input = in.nextInt();
-                if (input < 0 || input > 6) System.out.println("Please enter a number 1-5.");
-                else break;
+                try {
+                    input = in.nextInt();
+                    if (input < 1 || input > 6) System.out.println("Error: Please enter a number 1-6.");
+                    else break;
+                }
+                catch (Exception e) {
+                    System.out.println("Error: Please enter a number.");
+                    in.nextLine();
+                }
             }
             switch(input) {
                 case 1:
