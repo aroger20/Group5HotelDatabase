@@ -92,7 +92,9 @@ public class Group5HotelDatabase {
                     System.out.println("Loading delete...");
                     break;
                 case 5:
-                    System.out.println("Creating database...");
+                    System.out.print("Creating database...");
+                    createDatabase(conn);
+                    System.out.println("Done!");
                     break;
                 case 6:
                     System.out.println("Loading dummy data...");
@@ -102,6 +104,91 @@ public class Group5HotelDatabase {
                     loop = false;
                     break;
             }
+        }
+    }
+
+    public static void createDatabase(Connection conn) {
+        try {
+            //database creation
+            Statement stmt = conn.createStatement();
+            String create = "CREATE DATABASE hotel_database";
+            stmt.executeUpdate(create);
+            create = "USE hotel_database";
+            stmt.executeUpdate(create);
+
+            //table creation
+            String createTable = "CREATE TABLE hotel (" +
+                    "hotel_id INT NOT NULL," +
+                    "no_of_rooms INT," +
+                    "name VARCHAR(50) NOT NULL," +
+                    "phone_no VARCHAR(25) NOT NULL," +
+                    "address VARCHAR(125) NOT NULL," +
+                    "email VARCHAR(50) NOT NULL," +
+                    "PRIMARY KEY (hotel_id))";
+            stmt.executeUpdate(createTable);
+
+            createTable = "CREATE TABLE employee (" +
+                    "employee_id INT NOT NULL," +
+                    "hotel_id INT NOT NULL," +
+                    "name VARCHAR(50) NOT NULL," +
+                    "job_name varchar(50) NOT NULL," +
+                    "salary FLOAT NOT NULL," +
+                    "phone_no VARCHAR(25)," +
+                    "SSN INT NOT NULL," +
+                    "PRIMARY KEY (employee_id)," +
+                    "FOREIGN KEY (hotel_id) REFERENCES hotel(hotel_id)," +
+                    "UNIQUE (SSN))";
+            stmt.executeUpdate(createTable);
+
+            createTable = "CREATE TABLE job_description (" +
+                    "employee_id INT NOT NULL," +
+                    "job_description VARCHAR(125) NOT NULL," +
+                    "FOREIGN KEY (employee_id) REFERENCES employee(employee_id) ON DELETE CASCADE)";
+            stmt.executeUpdate(createTable);
+
+            createTable = "CREATE TABLE customer (" +
+                    "guest_id INT NOT NULL," +
+                    "name VARCHAR(50) NOT NULL," +
+                    "phone_no VARCHAR(25)," +
+                    "card_number BIGINT NOT NULL," +
+                    "email VARCHAR(50)," +
+                    "PRIMARY KEY (guest_id))";
+            stmt.executeUpdate(createTable);
+
+            createTable = "CREATE TABLE reservation (" +
+                    "reservation_id INT NOT NULL," +
+                    "guest_id INT NOT NULL," +
+                    "start_date DATE NOT NULL," +
+                    "end_date DATE NOT NULL," +
+                    "no_of_guests INT," +
+                    "room_no INT NOT NULL," +
+                    "PRIMARY KEY (reservation_id)," +
+                    "FOREIGN KEY (guest_id) REFERENCES customer(guest_id) ON DELETE CASCADE)";
+            stmt.executeUpdate(createTable);
+
+            createTable = "CREATE TABLE special_requests (" +
+                    "reservation_id INT NOT NULL," +
+                    "special_requests VARCHAR(125) NOT NULL," +
+                    "FOREIGN KEY (reservation_id) REFERENCES reservation(reservation_id) ON DELETE CASCADE)";
+            stmt.executeUpdate(createTable);
+
+            createTable = "CREATE TABLE can_be (" +
+                    "employee_id INT NOT NULL," +
+                    "guest_id INT NOT NULL," +
+                    "PRIMARY KEY (employee_id, guest_id)," +
+                    "FOREIGN KEY (employee_id) REFERENCES employee (employee_id) ON DELETE CASCADE," +
+                    "FOREIGN KEY (guest_id) REFERENCES customer (guest_id) ON DELETE CASCADE)";
+            stmt.executeUpdate(createTable);
+
+            createTable = "CREATE TABLE has (" +
+                    "hotel_id INT NOT NULL," +
+                    "reservation_id INT NOT NULL," +
+                    "PRIMARY KEY (hotel_id, reservation_id)," +
+                    "FOREIGN KEY (hotel_id) REFERENCES hotel (hotel_id) ON DELETE CASCADE," +
+                    "FOREIGN KEY (reservation_id) REFERENCES reservation (reservation_id) ON DELETE CASCADE)";
+            stmt.executeUpdate(createTable);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
