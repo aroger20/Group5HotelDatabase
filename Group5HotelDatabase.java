@@ -15,6 +15,8 @@ public class Group5HotelDatabase {
      * It then connects to the SQL server and runs a CLI to access it.
      */
     public static void main(String[] args) {
+    	
+    	System.out.println("Testing.");
         Connection conn = null;
         String url, driver, userName, password;
         Scanner in = new Scanner(System.in);
