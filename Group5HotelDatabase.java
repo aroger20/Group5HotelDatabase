@@ -97,7 +97,9 @@ public class Group5HotelDatabase {
                     System.out.println("Done!");
                     break;
                 case 6:
-                    System.out.println("Loading dummy data...");
+                    System.out.print("Loading dummy data...");
+                    insertDummyData(conn);
+                    System.out.println("Done!");
                     break;
                 case 7:
                     System.out.println("Goodbye...");
@@ -107,6 +109,10 @@ public class Group5HotelDatabase {
         }
     }
 
+    /**
+     * Creates the hotel_database on the sql server as well as all the tables.
+     * @param conn Connection
+     */
     public static void createDatabase(Connection conn) {
         try {
             //database creation
@@ -187,6 +193,74 @@ public class Group5HotelDatabase {
                     "FOREIGN KEY (hotel_id) REFERENCES hotel (hotel_id) ON DELETE CASCADE," +
                     "FOREIGN KEY (reservation_id) REFERENCES reservation (reservation_id) ON DELETE CASCADE)";
             stmt.executeUpdate(createTable);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Add dummy data to the hotel_database
+     * @param conn Connection
+     */
+    public static void insertDummyData(Connection conn) {
+        try{
+            Statement stmt = conn.createStatement();
+
+            //Hotel data
+            String insert = "INSERT INTO hotel \n" +
+                    "VALUES (1, 150, 'Tranquil Inn & Suites', '123-456-7890', '1624 West Street, Hays, KS 81452', 'TranquilInn@gmail.com')";
+            stmt.executeUpdate(insert);
+
+            //Employee data
+            insert = "INSERT INTO employee\n" +
+                    "VALUES (1, 1, 'Alex Rogers', 'General Manager', 95000, '321-456-7891', '124545674'),\n" +
+                    "(2, 1, 'Justin Salas', 'Head of Security', 72000, '789-123-4561', '784532647'),\n" +
+                    "(3, 1, 'Jonathan Layden', 'House Keeping Manager', 150, '405-457-4848', '784532612'),\n" +
+                    "(4, 1, 'Kaylee Calvert', 'Front Desk Manager', 68000, '154-124-7894', '784222612')";
+            stmt.executeUpdate(insert);
+
+            //Customer data
+            insert = "INSERT INTO customer\n" +
+                    "VALUES (1, 'Luke Skywalker', '000-0123', 0120301120121212, 'lukesky@gmail.com'),\n" +
+                    "(2, 'Darth Maul', '000-4321', 0974627148212371, 'damauler@gmail.com'),\n" +
+                    "(3, 'Kylo Ren', '000-6541', 0832573847212366, 'ren_kylo@gmail.com'),\n" +
+                    "(4, 'Jabba Hutt', '000-7243', 1858274638156172, 'jhutt@gmail.com')";
+            stmt.executeUpdate(insert);
+
+            //Job description data
+            insert = "INSERT INTO job_description\n" +
+                    "VALUES (1, 'Manage entire hotel.'),\n" +
+                    "(1, 'Manage all employees.'),\n" +
+                    "(2, 'Take down bad guys.'),\n" +
+                    "(2, 'Keep guests safe.'),\n" +
+                    "(3, 'Keep rooms clean.'),\n" +
+                    "(3, 'Keep rooms fully stocked.'),\n" +
+                    "(4, 'Receive incoming guests.'),\n" +
+                    "(4, 'Manage reservations.')";
+            stmt.executeUpdate(insert);
+
+            //Reservation data
+            insert = "INSERT INTO reservation\n" +
+                    "VALUES (1, 1, '2024-02-14', '2024-02-18', 2, 33),\n" +
+                    "(2, 1, '2025-10-10', '2025-10-12', 1, 24)";
+            stmt.executeUpdate(insert);
+
+            //Special request data
+            insert = "INSERT INTO special_requests\n" +
+                    "VALUES (1, 'Would like a picture of John Cena on the nightstand.'),\n" +
+                    "(2, 'Wedding anniversary: Would like roses all throughout the room.')";
+            stmt.executeUpdate(insert);
+
+            //Can be data
+            insert = "INSERT INTO can_be\n" +
+                    "VALUES (1, 1)";
+            stmt.executeUpdate(insert);
+
+            //Has data
+            insert = "INSERT INTO has\n" +
+                    "VALUES (1, 1),\n" +
+                    "(1, 2)";
+            stmt.executeUpdate(insert);
         } catch (Exception e) {
             e.printStackTrace();
         }
