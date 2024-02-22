@@ -58,11 +58,11 @@ public class Group5HotelDatabase {
         boolean loop = true;
         while(loop) {
             while(true) {
-                System.out.println("\n1)Query\n2)Insert\n3)Update\n4)Delete\n5)Load Dummy Data\n6)Quit");
+                System.out.println("\n1)Query\n2)Insert\n3)Update\n4)Delete\n5)Create Database\n6)Load Dummy Data\n7)Quit");
                 System.out.print("Please select a number: ");
                 try {
                     input = in.nextInt();
-                    if (input < 1 || input > 6) System.out.println("Error: Please enter a number 1-6.");
+                    if (input < 1 || input > 7) System.out.println("Error: Please enter a number 1-7.");
                     else break;
                 }
                 catch (Exception e) {
@@ -84,9 +84,12 @@ public class Group5HotelDatabase {
                     System.out.println("Loading delete...");
                     break;
                 case 5:
-                    System.out.println("Loading dummy data...");
+                    System.out.println("Creating database...");
                     break;
                 case 6:
+                    System.out.println("Loading dummy data...");
+                    break;
+                case 7:
                     System.out.println("Goodbye...");
                     loop = false;
                     break;
