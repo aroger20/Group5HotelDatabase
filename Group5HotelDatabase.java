@@ -18,14 +18,22 @@ public class Group5HotelDatabase {
         Connection conn = null;
         String url, driver, userName, password;
         Scanner in = new Scanner(System.in);
-        System.out.print("Please enter the url of the server: ");
-        url = in.nextLine();
-        System.out.print("Please enter your driver: ");
-        driver = in.nextLine();
-        System.out.print("Please enter your username: ");
-        userName = in.nextLine();
-        System.out.print("Please enter your password: ");
-        password = in.nextLine();
+        if (args.length == 4) {
+            url = args[0];
+            userName = args[1];
+            password = args[2];
+            driver = args[3];
+        }
+        else {
+            System.out.print("Please enter the url of the server: ");
+            url = in.nextLine();
+            System.out.print("Please enter your driver: ");
+            driver = in.nextLine();
+            System.out.print("Please enter your username: ");
+            userName = in.nextLine();
+            System.out.print("Please enter your password: ");
+            password = in.nextLine();
+        }
         try {
             Class.forName(driver);
             conn = DriverManager.getConnection(url, userName, password);
