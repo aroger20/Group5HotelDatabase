@@ -1,7 +1,19 @@
+/**
+ * This program uses a CLI to access a SQL database.
+ * The database stores information about a hotel.
+ *
+ * @author Alexander Rogers, Jonathan Layden, Justin Salas, Kaylee Calvert
+ */
+
 import java.sql.*;
 import java.io.*;
 import java.util.Scanner;
 public class Group5HotelDatabase {
+
+    /**
+     * The main method gets a server url, driver, username, and password from the user.
+     * It then connects to the SQL server and runs a CLI to access it.
+     */
     public static void main(String[] args) {
         Connection conn = null;
         String url, driver, userName, password;
@@ -32,6 +44,12 @@ public class Group5HotelDatabase {
         }
     }
 
+    /**
+     * This method prints the main menu for the SQL server.
+     * It has options to query, insert, update, delete, and load dummy data.
+     * @param in Scanner
+     * @param conn SQL connection
+     */
     public static void mainMenu(Scanner in, Connection conn) {
         int input;
         System.out.print("\n*********************************");
