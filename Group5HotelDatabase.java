@@ -15,8 +15,6 @@ public class Group5HotelDatabase {
      * It then connects to the SQL server and runs a CLI to access it.
      */
     public static void main(String[] args) {
-    	
-    	System.out.println("Testing.");
         Connection conn = null;
         String url, driver, userName, password;
         Scanner in = new Scanner(System.in);
@@ -82,7 +80,8 @@ public class Group5HotelDatabase {
             }
             switch(input) {
                 case 1:
-                    System.out.println("Loading query...");
+                    queryMenu(in, conn);
+                    loop = false;
                     break;
                 case 2:
                     System.out.println("Loading insert...");
@@ -267,4 +266,484 @@ public class Group5HotelDatabase {
             e.printStackTrace();
         }
     }
+    
+    /**
+     * Displays a menu of query options and prompts the user for input.
+     *
+     * @param in Scanner object for user input
+     * @param c  Connection to the database
+     */
+    private static void queryMenu(Scanner in, Connection c) {
+    	
+    	// Initialize database variables
+    	ResultSet rs = null;
+    	Statement s = null;
+    	PreparedStatement ps = null;
+    	ResultSetMetaData rsmd = null;
+    	
+    	
+    	// Variable to store user's choice
+    	int choice = 0;
+    	
+    	// Flag to control loop
+    	boolean loop = true;
+    	
+    	try {
+    		// Main loop for displaying the query menu
+	    	while (loop) {
+	    		// Display the query menu options
+		    	System.out.println("Query menu; please choose from one of the options below. Enter 12 to return to the main menu.");
+		    	System.out.println();
+		    	System.out.println("1)Retrieve All Hotels");
+		    	System.out.println("2)Retrieve All Employees");
+		    	System.out.println("3)Retrieve All Customers");
+		    	System.out.println("4)Retrieve All Reservations");
+		    	System.out.println("5)Retrieve All Reservations for a specific customer...");
+		    	System.out.println("6)Retrieve All Reservations for a specific date range...");
+		    	System.out.println("7)Retrieve All Employees in a specific job position...");
+		    	System.out.println("8)Retrieve All Special Requests for a specific reservation...");
+		    	System.out.println("9)Retrieve All Reservations for Valentine's Day and any special requests");
+		    	System.out.println("10)Retrieve All Customers who have more than one reservation");
+		    	System.out.println("11)Retrieve Total Number of reservations for each customer");
+		    	System.out.println("12)Return to Main Menu");
+		    	
+		    	try {
+		    		// Prompt user for choice
+		    		System.out.print("Please enter choice: ");
+		    		choice = in.nextInt();
+		    		in.nextLine(); // Consume newline character
+		    		System.out.println();
+		    	} catch (Exception e) {
+		    		System.out.println("Please enter a valid number.");
+		    		e.printStackTrace();
+		    	}
+		    	
+		    	// Perform action based on user's choice
+		    	switch(choice) {
+		    		case 1:
+		    			retrieveAll(c,s,rs,rsmd,"hotel");
+		    			break;
+		    		case 2:
+		    			retrieveAll(c,s,rs,rsmd,"employee");
+		    			break;
+		    		case 3:
+		    			retrieveAll(c,s,rs,rsmd,"customer");
+		    			break;
+		    		case 4:
+		    			retrieveAll(c,s,rs,rsmd,"reservation");
+		    			break;
+		    		case 5:
+		    			System.out.print("Please enter customer name: ");
+		    			String name = in.nextLine();
+		    			reservationsByCustomer(c,ps,rs,rsmd,name);
+		    			break;
+		    		case 6:
+		    			System.out.print("Please enter start date (yyyy-mm-dd): ");
+		    			String startDate = in.nextLine();
+		    			System.out.print("Please enter end date (yyyy-mm-dd): ");
+		    			String endDate = in.nextLine();
+		    			reservationsByDate(c,ps,rs,rsmd,startDate,endDate);
+		    			break;
+		    		case 7:
+		    			System.out.print("Please enter a position title: ");
+		    			String jobTitle = in.nextLine();
+		    			employeesByJob(c,ps,rs,rsmd,jobTitle);
+		    			break;
+		    		case 8:
+		    			System.out.print("Please enter a reservation id: ");
+		    			String reservationId = in.nextLine();
+		    			requestsByReservation(c,ps,rs,rsmd,reservationId);
+		    			break;
+		    		case 9:
+		    			reservationsOnValentines(c,s,rs,rsmd);
+		    			break;
+		    		case 10:
+		    			moreThanOneReservation(c,s,rs,rsmd);
+		    			break;
+		    		case 11:
+		    			totalReservationsPerCustomer(c,s,rs,rsmd);
+		    			break;
+		    		case 12:
+		    			mainMenu(in, c);
+		    			loop = false;
+		    			break;
+		    		default:
+		    			System.out.println("You must choose between 1-12");
+		    	} 
+	    	}
+    	} finally {
+    		// Close resources in the finally block to ensure they're closed regardless of exceptions
+    		try {
+    			if (rs != null) {
+    				rs.close();
+    			}
+    			if (ps != null) {
+    				ps.close();
+    			}
+    			if (s != null) {
+    				s.close();
+    			}
+    		} catch (Exception e) {
+    			e.printStackTrace();
+    		}
+    	}
+    }
+
+    /**
+     * Retrieves the total number of reservations for each customer.
+     *
+     * @param c         Connection to the database
+     * @param s         Statement object for executing SQL queries
+     * @param rs        ResultSet object for storing query results
+     * @param metaData  ResultSetMetaData object for retrieving metadata of the query results
+     */
+	private static void totalReservationsPerCustomer(Connection c, Statement s, ResultSet rs, ResultSetMetaData metaData) {
+
+		try {
+			s = c.createStatement();
+			
+			// Execute SQL query
+			rs = s.executeQuery("SELECT c.name, COUNT(r.reservation_id) AS total_reservations "
+					+ "FROM customer c "
+					+ "LEFT JOIN reservation r USING(guest_id) "
+					+ "GROUP BY c.name");
+			
+			// Get metadata
+			metaData = rs.getMetaData();
+			int columnCount = metaData.getColumnCount();
+			
+			// Print column headers
+			for (int i = 1; i <= columnCount; i++) {
+				System.out.print(metaData.getColumnName(i) + "\t");
+			}
+			System.out.println();
+			
+			// Print query results
+			while(rs.next()) {
+				for(int i = 1; i <= columnCount; i++) {
+					System.out.print(rs.getObject(i) + "\t");
+				}
+				System.out.println();
+			}
+			System.out.println();
+			System.out.println();
+		} catch (SQLException sqle) {
+			// Handle SQL exceptions
+			sqle.printStackTrace();
+		} 
+	}
+
+	/**
+	 * Retrieves customers who have more than one reservation from the database and prints their information.
+	 *
+	 * @param c         Connection to the database
+	 * @param s         Statement object for executing SQL queries
+	 * @param rs        ResultSet object for storing query results
+	 * @param metaData  ResultSetMetaData object for retrieving metadata of the query results
+	 */
+	private static void moreThanOneReservation(Connection c, Statement s, ResultSet rs, ResultSetMetaData metaData) {
+		
+		try {
+			// Create a statement for executing SQL queries
+			s = c.createStatement();
+			
+			// Execute SQL query to retrieve customers with more than one reservation
+			rs = s.executeQuery("SELECT c.guest_id, c.name, c.phone_no, c.card_number, c.email, COUNT(r.reservation_id) AS reservation_count "
+					+ "FROM customer c "
+					+ "JOIN reservation r ON c.guest_id = r.guest_id "
+					+ "GROUP BY c.guest_id, c.name, c.phone_no, c.card_number, c.email "
+					+ "HAVING COUNT(r.reservation_id) > 1");
+			
+			// Retreive metadata of the query results
+			metaData = rs.getMetaData();
+			int columnCount = metaData.getColumnCount();
+			
+			// Print column headers
+			for (int i = 1; i <= columnCount; i++) {
+				System.out.print(metaData.getColumnName(i) + "\t");
+			}
+			System.out.println();
+			
+			// Print query results
+			while(rs.next()) {
+				for(int i = 1; i <= columnCount; i++) {
+					System.out.print(rs.getObject(i) + "\t");
+				}
+				System.out.println();
+			}
+			System.out.println();
+			System.out.println();
+		} catch (SQLException sqle) {
+			// handle sql exceptions
+			sqle.printStackTrace();
+		} 
+	}
+
+	/**
+	 * Retrieves reservations made on Valentine's Day and any special requests associated with them.
+	 *
+	 * @param c         Connection to the database
+	 * @param s         Statement object for executing SQL queries
+	 * @param rs        ResultSet object for storing query results
+	 * @param metaData  ResultSetMetaData object for retrieving metadata of the query results
+	 */
+	private static void reservationsOnValentines(Connection c, Statement s, ResultSet rs, ResultSetMetaData metaData) {
+	    
+	    try {
+	        // Create a statement for executing SQL queries
+	        s = c.createStatement();
+	        
+	        // Execute SQL query to retrieve reservations on Valentine's Day and associated special requests
+	        rs = s.executeQuery("SELECT r.reservation_id, r.guest_id, r.start_date, r.end_date, r.no_of_guests, r.room_no, s.special_requests "
+	                + "FROM reservation r "
+	                + "JOIN special_requests s USING(reservation_id) "
+	                + "WHERE r.start_date BETWEEN '2024-02-14' AND '2024-02-18'");
+	        
+	        // Retrieve metadata of the query results
+	        metaData = rs.getMetaData();
+	        int columnCount = metaData.getColumnCount();
+	        
+	        // Print column headers
+	        for (int i = 1; i <= columnCount; i++) {
+	            System.out.print(metaData.getColumnName(i) + "\t");
+	        }
+	        System.out.println();
+	        
+	        // Print query results
+	        while(rs.next()) {
+	            for(int i = 1; i <= columnCount; i++) {
+	                System.out.print(rs.getObject(i) + "\t");
+	            }
+	            System.out.println();
+	        }
+	        System.out.println();
+	        System.out.println();
+	    } catch (SQLException sqle) {
+	        // Handle SQL exceptions
+	        sqle.printStackTrace();
+	    } 
+	}
+
+	/**
+	 * Retrieves special requests associated with a specific reservation.
+	 *
+	 * @param c             Connection to the database
+	 * @param ps            PreparedStatement object for executing SQL queries with parameters
+	 * @param rs            ResultSet object for storing query results
+	 * @param metaData      ResultSetMetaData object for retrieving metadata of the query results
+	 * @param reservationId Reservation ID for which special requests are to be retrieved
+	 */
+	private static void requestsByReservation(Connection c, PreparedStatement ps, ResultSet rs, ResultSetMetaData metaData, String reservationId) {
+	    
+	    try {
+	        // Create a prepared statement for executing SQL queries with parameters
+	        ps = c.prepareStatement("SELECT * FROM special_requests WHERE reservation_id = ?");
+	        ps.setString(1, reservationId);
+	        
+	        // Execute SQL query to retrieve special requests for the given reservation ID
+	        rs = ps.executeQuery();
+	        
+	        // Retrieve metadata of the query results
+	        metaData = rs.getMetaData();
+	        int columnCount = metaData.getColumnCount();
+	        
+	        // Print column headers
+	        for (int i = 1; i <= columnCount; i++) {
+	            System.out.print(metaData.getColumnName(i) + "\t");
+	        }
+	        System.out.println();
+	        
+	        // Print query results
+	        while(rs.next()) {
+	            for(int i = 1; i <= columnCount; i++) {
+	                System.out.print(rs.getObject(i) + "\t");
+	            }
+	            System.out.println();
+	        }
+	        System.out.println();
+	        System.out.println();
+	    } catch (SQLException sqle) {
+	        // Handle SQL exceptions
+	        sqle.printStackTrace();
+	    } 
+	}
+
+	/**
+	 * Retrieves employees with a specific job title from the database.
+	 *
+	 * @param c         Connection to the database
+	 * @param ps        PreparedStatement object for executing SQL queries with parameters
+	 * @param rs        ResultSet object for storing query results
+	 * @param metaData  ResultSetMetaData object for retrieving metadata of the query results
+	 * @param jobTitle  Job title of the employees to be retrieved
+	 */
+	private static void employeesByJob(Connection c, PreparedStatement ps, ResultSet rs, ResultSetMetaData metaData, String jobTitle) {
+	    
+	    try {
+	        // Create a prepared statement for executing SQL queries with parameters
+	        ps = c.prepareStatement("SELECT * FROM employee WHERE job_name = ?");
+	        ps.setString(1, jobTitle);
+	        
+	        // Execute SQL query to retrieve employees with the specified job title
+	        rs = ps.executeQuery();
+	        
+	        // Retrieve metadata of the query results
+	        metaData = rs.getMetaData();
+	        int columnCount = metaData.getColumnCount();
+	        
+	        // Print column headers
+	        for (int i = 1; i <= columnCount; i++) {
+	            System.out.print(metaData.getColumnName(i) + "\t");
+	        }
+	        System.out.println();
+	        
+	        // Print query results
+	        while(rs.next()) {
+	            for(int i = 1; i <= columnCount; i++) {
+	                System.out.print(rs.getObject(i) + "\t");
+	            }
+	            System.out.println();
+	        }
+	        System.out.println();
+	        System.out.println();
+	    } catch (SQLException sqle) {
+	        // Handle SQL exceptions
+	        sqle.printStackTrace();
+	    } 
+	}
+
+	/**
+	 * Retrieves reservations made within a specific date range from the database.
+	 *
+	 * @param c         Connection to the database
+	 * @param ps        PreparedStatement object for executing SQL queries with parameters
+	 * @param rs        ResultSet object for storing query results
+	 * @param metaData  ResultSetMetaData object for retrieving metadata of the query results
+	 * @param startDate Start date of the date range
+	 * @param endDate   End date of the date range
+	 */
+	private static void reservationsByDate(Connection c, PreparedStatement ps, ResultSet rs, ResultSetMetaData metaData, String startDate, String endDate) {
+	    
+	    try {
+	        // Create a prepared statement for executing SQL queries with parameters
+	        ps = c.prepareStatement("SELECT * FROM reservation WHERE start_date >= ? AND end_date <= ?");
+	        ps.setString(1, startDate);
+	        ps.setString(2, endDate);
+	        
+	        // Execute SQL query to retrieve reservations within the specified date range
+	        rs = ps.executeQuery();
+	        
+	        // Retrieve metadata of the query results
+	        metaData = rs.getMetaData();
+	        int columnCount = metaData.getColumnCount();
+	        
+	        // Print column headers
+	        for (int i = 1; i <= columnCount; i++) {
+	            System.out.print(metaData.getColumnName(i) + "\t");
+	        }
+	        System.out.println();
+	        
+	        // Print query results
+	        while(rs.next()) {
+	            for(int i = 1; i <= columnCount; i++) {
+	                System.out.print(rs.getObject(i) + "\t");
+	            }
+	            System.out.println();
+	        }
+	        System.out.println();
+	        System.out.println();
+	    } catch (SQLException sqle) {
+	        // Handle SQL exceptions
+	        sqle.printStackTrace();
+	    } 
+	}
+
+	/**
+	 * Retrieves reservations made by a specific customer from the database.
+	 *
+	 * @param c         Connection to the database
+	 * @param ps        PreparedStatement object for executing SQL queries with parameters
+	 * @param rs        ResultSet object for storing query results
+	 * @param metaData  ResultSetMetaData object for retrieving metadata of the query results
+	 * @param name      Name of the customer whose reservations are to be retrieved
+	 */
+	private static void reservationsByCustomer(Connection c, PreparedStatement ps, ResultSet rs, ResultSetMetaData metaData, String name) {
+	    
+	    try {
+	        // Create a prepared statement for executing SQL queries with parameters
+	        ps = c.prepareStatement("SELECT r.reservation_id, r.guest_id, r.start_date, r.end_date, r.no_of_guests, r.room_no "
+	                + "FROM reservation r JOIN customer c USING(guest_id) "
+	                + "WHERE c.name = ?");
+	        ps.setString(1, name);
+	        
+	        // Execute SQL query to retrieve reservations made by the specified customer
+	        rs = ps.executeQuery();
+	        
+	        // Retrieve metadata of the query results
+	        metaData = rs.getMetaData();
+	        int columnCount = metaData.getColumnCount();
+	        
+	        // Print column headers
+	        for (int i = 1; i <= columnCount; i++) {
+	            System.out.print(metaData.getColumnName(i) + "\t");
+	        }
+	        System.out.println();
+	        
+	        // Print query results
+	        while(rs.next()) {
+	            for(int i = 1; i <= columnCount; i++) {
+	                System.out.print(rs.getObject(i) + "\t");
+	            }
+	            System.out.println();
+	        }
+	        System.out.println();
+	        System.out.println();
+	    } catch (SQLException sqle) {
+	        // Handle SQL exceptions
+	        sqle.printStackTrace();
+	    } 
+	}
+
+	/**
+	 * Retrieves all records from a specified table in the database.
+	 *
+	 * @param c         Connection to the database
+	 * @param s         Statement object for executing SQL queries
+	 * @param rs        ResultSet object for storing query results
+	 * @param metaData  ResultSetMetaData object for retrieving metadata of the query results
+	 * @param table     Name of the table from which records are to be retrieved
+	 */
+	private static void retrieveAll(Connection c, Statement s, ResultSet rs, ResultSetMetaData metaData, String table) {
+	    
+	    try {
+	        // Create a statement for executing SQL queries
+	        s = c.createStatement();
+	        
+	        // Execute SQL query to retrieve all records from the specified table
+	        rs = s.executeQuery("SELECT * FROM " + table);
+	        
+	        // Retrieve metadata of the query results
+	        metaData = rs.getMetaData();
+	        int columnCount = metaData.getColumnCount();
+	        
+	        // Print column headers
+	        for (int i = 1; i <= columnCount; i++) {
+	            System.out.print(metaData.getColumnName(i) + "\t");
+	        }
+	        System.out.println();
+	        
+	        // Print query results
+	        while(rs.next()) {
+	            for(int i = 1; i <= columnCount; i++) {
+	                System.out.print(rs.getObject(i) + "\t");
+	            }
+	            System.out.println();
+	        }
+	        System.out.println();
+	        System.out.println();
+	    } catch (SQLException sqle) {
+	        // Handle SQL exceptions
+	        sqle.printStackTrace();
+	    } 
+	}
 }
