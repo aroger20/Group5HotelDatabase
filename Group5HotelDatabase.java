@@ -16,6 +16,39 @@ public class Group5HotelDatabase {
      */
     public static void main(String[] args) {
         Connection conn = null;
+	    
+	/*
+	// Justin Salas: For quick run config use
+		if (args.length < 4 || args.length > 5) {
+            System.out.print("Incorrect command-line arguments provided.");
+            System.out.println("Usage: java Group5HotelDatabase <url> <driver> <username> <password>");
+            System.exit(1);
+        }
+
+        // Retrieve command-line arguments
+        String url = args[0];
+        String driver = args[1];
+        String userName = args[2];
+        String password = args[3];
+
+        try {
+            Class.forName(driver);
+            conn = DriverManager.getConnection(url, userName, password);
+            mainMenu(new Scanner(System.in), conn);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (conn != null) conn.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+ 	*
+ 	*/
+
+
+	    
         String url, driver, userName, password;
         Scanner in = new Scanner(System.in);
         if (args.length == 4) {
@@ -91,6 +124,33 @@ public class Group5HotelDatabase {
                     queryMenu(in, conn);
                     break;
                 case 2:
+		    InsertData insertData = new InsertData();
+                    System.out.println("1) Hotel\n2) Employee\n3) Job Description\n4) Customer\n5) Reservation\n6) Special Request");
+                    System.out.print("Select option: ");
+                    int userOpt = in.nextInt();
+
+                    switch (userOpt) {
+                        case 1:
+                            InsertData.insertHotel(in, conn);
+                            break;
+                        case 2:
+                            InsertData.insertEmployee(in, conn);
+                            break;
+                        case 3:
+                            InsertData.insertJobDesc(in, conn);
+                            break;
+                        case 4:
+                            InsertData.insertCustomer(in, conn);
+                            break;
+                        case 5:
+                            InsertData.insertReservation(in, conn);
+                            break;
+                        case 6:
+                            InsertData.insertSpecialRequest(in, conn);
+                            break;
+                        default:
+                            System.out.println("Please select an option from 1-6.");
+                    }
                     System.out.println("Loading insert...");
                     break;
                 case 3:
