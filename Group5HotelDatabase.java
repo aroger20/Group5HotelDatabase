@@ -64,14 +64,6 @@ public class Group5HotelDatabase {
         System.out.print("\n* Group 5 Hotel Database System *");
         System.out.println("\n*********************************");
         boolean loop = true;
-        try {
-            Statement stmt = conn.createStatement();
-            String useDatabase = "USE hotel_database";
-            stmt.executeUpdate(useDatabase);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return;
-        }
         while(loop) {
             while(true) {
                 System.out.println("\n1)Query\n2)Insert\n3)Update\n4)Delete\n5)Create Database\n6)Load Dummy Data\n7)Quit");
