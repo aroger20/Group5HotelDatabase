@@ -64,6 +64,14 @@ public class Group5HotelDatabase {
         System.out.print("\n* Group 5 Hotel Database System *");
         System.out.println("\n*********************************");
         boolean loop = true;
+        try {
+            Statement stmt = conn.createStatement();
+            String useDatabase = "USE hotel_database";
+            stmt.executeUpdate(useDatabase);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return;
+        }
         while(loop) {
             while(true) {
                 System.out.println("\n1)Query\n2)Insert\n3)Update\n4)Delete\n5)Create Database\n6)Load Dummy Data\n7)Quit");
@@ -91,6 +99,8 @@ public class Group5HotelDatabase {
                     break;
                 case 4:
                     System.out.println("Loading delete...");
+                    delete(conn, in);
+                    System.out.println("Done!");
                     break;
                 case 5:
                     System.out.print("Creating database...");
@@ -746,4 +756,29 @@ public class Group5HotelDatabase {
 	        sqle.printStackTrace();
 	    } 
 	}
+
+    public static void delete(Connection conn, Scanner in) {
+        try {
+            Statement stmt = conn.createStatement();
+
+            System.out.print("Enter the name of the table from which you want to delete records: ");
+            String tableName = in.next().trim();
+
+            in.nextLine();
+
+            System.out.print("Enter the condition for deletion (e.g., 'id = 1'): ");
+            String condition = in.nextLine().trim();
+
+            StringBuilder deleteQuery = new StringBuilder("DELETE FROM " + tableName);
+            if (!condition.isEmpty()) {
+                deleteQuery.append(" WHERE ").append(condition);
+            }
+            System.out.println("DEBUG: Delete query: " + deleteQuery.toString());
+
+            int rowsAffected = stmt.executeUpdate(deleteQuery.toString());
+            System.out.println(rowsAffected + " records deleted successfully.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
