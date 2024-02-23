@@ -89,7 +89,6 @@ public class Group5HotelDatabase {
             switch(input) {
                 case 1:
                     queryMenu(in, conn);
-                    loop = false;
                     break;
                 case 2:
                     System.out.println("Loading insert...");
@@ -374,7 +373,6 @@ public class Group5HotelDatabase {
 		    			totalReservationsPerCustomer(c,s,rs,rsmd);
 		    			break;
 		    		case 12:
-		    			mainMenu(in, c);
 		    			loop = false;
 		    			break;
 		    		default:
