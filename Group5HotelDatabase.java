@@ -116,7 +116,7 @@ public class Group5HotelDatabase {
                     queryMenu(in, conn);
                     break;
                 case 2:
-		    InsertData insertData = new InsertData();
+					System.out.println("Loading insert...");
                     System.out.println("1) Hotel\n2) Employee\n3) Job Description\n4) Customer\n5) Reservation\n6) Special Request");
                     System.out.print("Select option: ");
                     int userOpt = in.nextInt();
@@ -143,7 +143,6 @@ public class Group5HotelDatabase {
                         default:
                             System.out.println("Please select an option from 1-6.");
                     }
-                    System.out.println("Loading insert...");
                     break;
                 case 3:
                     System.out.println("Loading update...");
