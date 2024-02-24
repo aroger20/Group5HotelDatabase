@@ -146,6 +146,7 @@ public class Group5HotelDatabase {
                     break;
                 case 3:
                     System.out.println("Loading update...");
+					update(conn, in);
                     break;
                 case 4:
                     System.out.println("Loading delete...");
@@ -830,4 +831,34 @@ public class Group5HotelDatabase {
             e.printStackTrace();
         }
     }
+
+	public static void update(Connection conn, Scanner in) {
+		try {
+			Statement stmt = conn.createStatement();
+
+			System.out.print("Enter the name of the table from which you want to update records: ");
+			String tableName = in.next().trim();
+
+			in.nextLine();
+
+			System.out.print("Enter the entity you wish to update (e.g., 'id = 1'): ");
+			String condition = in.nextLine().trim();
+
+			System.out.print("Enter the values you wish to update (e.g., 'end_date = 2024-06-06'): ");
+			String updatedInfo = in.nextLine().trim();
+
+			StringBuilder updateQuery = new StringBuilder("UPDATE " + tableName);
+			if (!updatedInfo.isEmpty()) {
+				updateQuery.append(" SET ").append(updatedInfo);
+			}
+			if (!condition.isEmpty()) {
+				updateQuery.append(" WHERE ").append(condition);
+			}
+
+			int rowsAffected = stmt.executeUpdate(updateQuery.toString());
+			System.out.println(rowsAffected + " record successfully updated.");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 }
