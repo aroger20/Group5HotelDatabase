@@ -175,16 +175,17 @@ public class Group5HotelDatabase {
      * @param conn Connection
      */
     public static void createDatabase(Connection conn) {
+	    // JS: added IF NOT EXISTS to tables to get rid of error/warning
         try {
             //database creation
             Statement stmt = conn.createStatement();
-            String create = "CREATE DATABASE hotel_database";
+            String create = "CREATE DATABASE IF NOT EXISTS hotel_database";
             stmt.executeUpdate(create);
             create = "USE hotel_database";
             stmt.executeUpdate(create);
 
             //table creation
-            String createTable = "CREATE TABLE hotel (" +
+            String createTable = "CREATE TABLE IF NOT EXISTS hotel (" +
                     "hotel_id INT NOT NULL," +
                     "no_of_rooms INT," +
                     "name VARCHAR(50) NOT NULL," +
@@ -194,7 +195,7 @@ public class Group5HotelDatabase {
                     "PRIMARY KEY (hotel_id))";
             stmt.executeUpdate(createTable);
 
-            createTable = "CREATE TABLE employee (" +
+            createTable = "CREATE TABLE IF NOT EXISTS employee (" +
                     "employee_id INT NOT NULL," +
                     "hotel_id INT NOT NULL," +
                     "name VARCHAR(50) NOT NULL," +
@@ -207,13 +208,13 @@ public class Group5HotelDatabase {
                     "UNIQUE (SSN))";
             stmt.executeUpdate(createTable);
 
-            createTable = "CREATE TABLE job_description (" +
+            createTable = "CREATE TABLE IF NOT EXISTS job_description (" +
                     "employee_id INT NOT NULL," +
                     "job_description VARCHAR(125) NOT NULL," +
                     "FOREIGN KEY (employee_id) REFERENCES employee(employee_id) ON DELETE CASCADE)";
             stmt.executeUpdate(createTable);
 
-            createTable = "CREATE TABLE customer (" +
+            createTable = "CREATE TABLE IF NOT EXISTS customer (" +
                     "guest_id INT NOT NULL," +
                     "name VARCHAR(50) NOT NULL," +
                     "phone_no VARCHAR(25)," +
@@ -222,7 +223,7 @@ public class Group5HotelDatabase {
                     "PRIMARY KEY (guest_id))";
             stmt.executeUpdate(createTable);
 
-            createTable = "CREATE TABLE reservation (" +
+            createTable = "CREATE TABLE IF NOT EXISTS reservation (" +
                     "reservation_id INT NOT NULL," +
                     "guest_id INT NOT NULL," +
                     "start_date DATE NOT NULL," +
@@ -233,13 +234,13 @@ public class Group5HotelDatabase {
                     "FOREIGN KEY (guest_id) REFERENCES customer(guest_id) ON DELETE CASCADE)";
             stmt.executeUpdate(createTable);
 
-            createTable = "CREATE TABLE special_requests (" +
+            createTable = "CREATE TABLE IF NOT EXISTS special_requests (" +
                     "reservation_id INT NOT NULL," +
                     "special_requests VARCHAR(125) NOT NULL," +
                     "FOREIGN KEY (reservation_id) REFERENCES reservation(reservation_id) ON DELETE CASCADE)";
             stmt.executeUpdate(createTable);
 
-            createTable = "CREATE TABLE can_be (" +
+            createTable = "CREATE TABLE IF NOT EXISTS can_be (" +
                     "employee_id INT NOT NULL," +
                     "guest_id INT NOT NULL," +
                     "PRIMARY KEY (employee_id, guest_id)," +
@@ -247,7 +248,7 @@ public class Group5HotelDatabase {
                     "FOREIGN KEY (guest_id) REFERENCES customer (guest_id) ON DELETE CASCADE)";
             stmt.executeUpdate(createTable);
 
-            createTable = "CREATE TABLE has (" +
+            createTable = "CREATE TABLE IF NOT EXISTS has (" +
                     "hotel_id INT NOT NULL," +
                     "reservation_id INT NOT NULL," +
                     "PRIMARY KEY (hotel_id, reservation_id)," +
